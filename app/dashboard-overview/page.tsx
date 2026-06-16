@@ -681,4 +681,180 @@ export default function DashboardOverviewPage() {
               <div className="space-y-1">
                 <div className="grid grid-cols-4 text-xs text-slate-500 font-medium pb-2 border-b border-slate-800/60">
                   <span className="col-span-2">Page</span>
-                  <span className="text
+                  <span className="text-right">Views</span>
+                  <span className="text-right">Avg Duration</span>
+                </div>
+                {topPages.map((page, idx) => (
+                  <div
+                    key={page.path}
+                    className="grid grid-cols-4 text-xs py-2 hover:bg-slate-800/30 rounded-lg px-1 transition-colors duration-150 group"
+                  >
+                    <div className="col-span-2 flex items-center gap-2">
+                      <span className="text-slate-600 font-mono w-4 text-right shrink-0">
+                        {idx + 1}
+                      </span>
+                      <span className="text-slate-300 font-mono truncate">{page.path}</span>
+                    </div>
+                    <span className="text-right text-slate-300 font-medium">
+                      {page.views.toLocaleString()}
+                    </span>
+                    <span className="text-right text-slate-400">{page.duration}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ── Transactions Table ── */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={shouldReduceMotion ? {} : fadeInUp}
+          className="rounded-2xl bg-slate-900/70 border border-slate-800/60 overflow-hidden"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-6 border-b border-slate-800/60">
+            <div>
+              <h2 className="text-base font-semibold text-white">
+                Recent Transactions
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Latest subscription payments
+              </p>
+            </div>
+            <Link
+              href="/revenue"
+              className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors duration-200 flex items-center gap-1 self-start sm:self-auto"
+            >
+              View all transactions <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          {/* Table — desktop */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-800/60">
+                  {["Customer", "Plan", "Amount", "Status", "Date", ""].map((h) => (
+                    <th
+                      key={h}
+                      className="text-left text-xs font-medium text-slate-500 px-6 py-3 first:pl-6 last:pr-6"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {recentTransactions.map((tx, idx) => (
+                  <motion.tr
+                    key={tx.id}
+                    initial={shouldReduceMotion ? {} : { opacity: 0, x: -8 }}
+                    whileInView={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.04, duration: 0.35, ease: "easeOut" }}
+                    className="border-b border-slate-800/40 hover:bg-slate-800/30 transition-colors duration-150 group"
+                  >
+                    <td className="px-6 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                          {tx.avatar}
+                        </div>
+                        <span className="text-slate-200 font-medium text-sm">
+                          {tx.customer}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3.5">
+                      <span className="text-xs font-medium text-slate-400 bg-slate-800 px-2 py-1 rounded-md border border-slate-700/40">
+                        {tx.plan}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 text-slate-200 font-semibold">
+                      ${(tx.amount ?? 0).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-3.5">
+                      <span
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${statusStyles[tx.status] ?? statusStyles.pending}`}
+                      >
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 text-slate-400 text-xs">{tx.date}</td>
+                    <td className="px-6 py-3.5">
+                      <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-slate-200">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile card list */}
+          <div className="sm:hidden divide-y divide-slate-800/60">
+            {recentTransactions.map((tx) => (
+              <div key={tx.id} className="flex items-center justify-between px-4 py-3.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                    {tx.avatar}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-200">{tx.customer}</p>
+                    <p className="text-xs text-slate-500">{tx.plan} · {tx.date}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-sm font-semibold text-slate-200">
+                    ${(tx.amount ?? 0).toLocaleString()}
+                  </span>
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusStyles[tx.status] ?? statusStyles.pending}`}
+                  >
+                    {tx.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── Quick Links ── */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={shouldReduceMotion ? {} : staggerContainer}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-4"
+        >
+          {[
+            { label: "Analytics", href: "/analytics", desc: "Deep-dive reports", color: "indigo" },
+            { label: "Users", href: "/users", desc: "Manage accounts", color: "violet" },
+            { label: "Revenue", href: "/revenue", desc: "Billing & invoices", color: "cyan" },
+            { label: "Settings", href: "/settings", desc: "Configure workspace", color: "emerald" },
+          ].map((item) => (
+            <motion.div
+              key={item.href}
+              variants={shouldReduceMotion ? {} : scaleIn}
+              whileHover={shouldReduceMotion ? {} : { y: -3, scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Link
+                href={item.href}
+                className="flex flex-col gap-1.5 p-4 rounded-2xl bg-slate-900/70 border border-slate-800/60 hover:border-indigo-500/30 hover:bg-slate-800/60 transition-all duration-200 group"
+              >
+                <span className="text-sm font-semibold text-slate-200 group-hover:text-indigo-300 transition-colors duration-200">
+                  {item.label}
+                </span>
+                <span className="text-xs text-slate-500">{item.desc}</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-indigo-400 transition-colors duration-200 mt-1" />
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </main>
+  );
+}
